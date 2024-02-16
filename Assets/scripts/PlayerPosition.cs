@@ -5,4 +5,5 @@ using UnityEngine;
 public static class  PlayerPosition
 {
     public static Vector2 position=Vector2.zero;
+    public static bool halt = false;
 }

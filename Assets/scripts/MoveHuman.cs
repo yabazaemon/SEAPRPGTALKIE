@@ -52,76 +52,78 @@ public class MoveHuman : MonoBehaviour
     void Update()
     {
         Vector2 pos = rb.position;
-        
 
-        if (Input.GetKey(KeyCode.A))//左移動
+        if (PlayerPosition.halt == false)
         {
-            anim.SetBool("to-right", false);
-            anim.SetBool("to-left", true);
-            anim.SetBool("to-stop", false);
-            anim.SetBool("to-front", false);
-            anim.SetBool("to-back", false);
-            pos += new Vector2(-speed * Time.deltaTime, 0.0f);
-        }
-
-        if (Input.GetKey(KeyCode.D))//右移動
-        {
-            anim.SetBool("to-right", true);
-            anim.SetBool("to-left", false);
-            anim.SetBool("to-stop", false);
-            anim.SetBool("to-front", false);
-            anim.SetBool("to-back", false);
-            pos += new Vector2(speed * Time.deltaTime, 0.0f);
-        }
-
-        if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.W) & !Input.GetKey(KeyCode.S))//停止
-        {
-            anim.SetBool("to-right", false);
-            anim.SetBool("to-left", false);
-            anim.SetBool("to-stop", true);
-            anim.SetBool("to-front", false);
-            anim.SetBool("to-back", false);
-        }
-
-        if (Input.GetKey(KeyCode.W))//前進
-        {
-            anim.SetBool("to-right", false);
-            anim.SetBool("to-left", false);
-            anim.SetBool("to-stop", false);
-            anim.SetBool("to-front", false);
-            anim.SetBool("to-back", true);
-            pos += new Vector2(0.0f, speed * Time.deltaTime);
-        }
-
-        if (Input.GetKey(KeyCode.S))//後進
-        {
-            anim.SetBool("to-right", false);
-            anim.SetBool("to-left", false);
-            anim.SetBool("to-stop", false);
-            anim.SetBool("to-front", true);
-            anim.SetBool("to-back", false);
-            pos += new Vector2(0.0f, -speed * Time.deltaTime);
-        }
-
-        rb.position = pos;
-
-        if (Input.GetKeyDown(KeyCode.Space)&&tc.isTouch)
-        {
-            StartCoroutine(FadeIn());
-            PlayerPosition.position = pos;
-            //PlayerPrefs.SetInt("Check1",1)
-            Debug.Log(flag1);
-            if(flag1==0)
+            if (Input.GetKey(KeyCode.A))//左移動
             {
-                PlayerPrefs.SetInt("Key2", 1);
-                PlayerPrefs.Save();
-            }
-            else
-            {
-                PlayerPrefs.SetInt("Key2", 2);
-                PlayerPrefs.Save();
+                anim.SetBool("to-right", false);
+                anim.SetBool("to-left", true);
+                anim.SetBool("to-stop", false);
+                anim.SetBool("to-front", false);
+                anim.SetBool("to-back", false);
+                pos += new Vector2(-speed * Time.deltaTime, 0.0f);
             }
 
+            if (Input.GetKey(KeyCode.D))//右移動
+            {
+                anim.SetBool("to-right", true);
+                anim.SetBool("to-left", false);
+                anim.SetBool("to-stop", false);
+                anim.SetBool("to-front", false);
+                anim.SetBool("to-back", false);
+                pos += new Vector2(speed * Time.deltaTime, 0.0f);
+            }
+
+            if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.W) & !Input.GetKey(KeyCode.S))//停止
+            {
+                anim.SetBool("to-right", false);
+                anim.SetBool("to-left", false);
+                anim.SetBool("to-stop", true);
+                anim.SetBool("to-front", false);
+                anim.SetBool("to-back", false);
+            }
+
+            if (Input.GetKey(KeyCode.W))//前進
+            {
+                anim.SetBool("to-right", false);
+                anim.SetBool("to-left", false);
+                anim.SetBool("to-stop", false);
+                anim.SetBool("to-front", false);
+                anim.SetBool("to-back", true);
+                pos += new Vector2(0.0f, speed * Time.deltaTime);
+            }
+
+            if (Input.GetKey(KeyCode.S))//後進
+            {
+                anim.SetBool("to-right", false);
+                anim.SetBool("to-left", false);
+                anim.SetBool("to-stop", false);
+                anim.SetBool("to-front", true);
+                anim.SetBool("to-back", false);
+                pos += new Vector2(0.0f, -speed * Time.deltaTime);
+            }
+
+            rb.position = pos;
+
+            if (Input.GetKeyDown(KeyCode.Space) && tc.isTouch)
+            {
+                StartCoroutine(FadeIn());
+                PlayerPosition.position = pos;
+                //PlayerPrefs.SetInt("Check1",1)
+                Debug.Log(flag1);
+                if (flag1 == 0)
+                {
+                    PlayerPrefs.SetInt("Key2", 1);
+                    PlayerPrefs.Save();
+                }
+                else
+                {
+                    PlayerPrefs.SetInt("Key2", 2);
+                    PlayerPrefs.Save();
+                }
+
+            }
         }
     }
 
