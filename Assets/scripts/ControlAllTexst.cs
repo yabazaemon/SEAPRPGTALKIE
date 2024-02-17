@@ -42,6 +42,8 @@ public class ControlAllTexst : MonoBehaviour
     GameObject sort_image1;
     GameObject inst_sort_image1;
     private Canvas canvas = null;
+    int check_existence = 0;
+    int h = 0;
 
     //文末を知らせる点滅オブジェクト
     GameObject blink;
@@ -62,6 +64,8 @@ public class ControlAllTexst : MonoBehaviour
 
     //使用する文の入れ物
     private Dictionary<int, string> dic;
+    private Dictionary<int, string> stage1_dic;
+    private Dictionary<int, string> stage2_dic;
 
     //使用する関数の指定をするbool値群
     public bool NormalTalk;
@@ -98,13 +102,22 @@ public class ControlAllTexst : MonoBehaviour
         
 
 
-        dic = new Dictionary<int, string>()
+        stage1_dic = new Dictionary<int, string>()
         {
             {1, "N.P,Kは植物の成長に必要な三大栄養素だよ"},
             {2, "土壌に含まれるNPKと作物に含有されるNPKにはやはり差がある"},
             {3, "このうち、Nにおいて一番大きな差がある"},
             {4, "NKが外部から供給されるのに対して、Pは必要量が少ないものの外部から供給されることがほとんどない"},
             {5, "つまり、植物が長期間栽培され続けると土壌中のPが不足してしまうんだ"}
+        };
+
+        stage2_dic = new Dictionary<int, string>()
+        {
+            {1, "喫煙による医療費1兆4902億円/年"},
+            {2, "土壌に含まれるNPKと作物に含有されるNPKにはやはり差がある"},
+            {3, "新版　土壌学の基礎"},
+            {4, "NKが外部から供給されるのに対して、Pは必要量が少ないものの外部から供給されることがほとんどない"},
+            {5, "肥料になった鉱物の物語"}
         };
 
 
@@ -129,7 +142,7 @@ public class ControlAllTexst : MonoBehaviour
             }
             if (dousunnda == true)//とりあえずここでワンクッション入れた
             {
-                normal_talk(5, new int[] { 2, 1, 1, 3, 4 }, 0.04f, 0, 0);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                normal_talk(stage2_dic, 5, new int[] { 2, 1, 5, 3, 4 }, 0.04f, 0, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
 
             }
             textStop = false;
@@ -146,7 +159,7 @@ public class ControlAllTexst : MonoBehaviour
             }
             if (dousunnen == true)//とりあえずここでワンクッション入れた
             {
-                stand_image_talk(3, new int[] { 2, 1, 1 }, 0.04f, 1, 2);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                stand_image_talk(stage1_dic, 3, new int[] { 2, 1, 1 }, 0.04f, 0, 3);//画像変更をしない場合、st_st_numとdel_numを0にしてください
 
             }
             textStop = false;
@@ -156,19 +169,19 @@ public class ControlAllTexst : MonoBehaviour
     }
 
 
-    void normal_talk(int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
-    {
+    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
+    {//画像挿入では、挿入したい～文目から-1をした数を入れてください。/////画像を消す～文目は-1をしなくて大丈夫です。
 
         if (textStop == false)
         {
-            if (set_panel == 0)
+            if (set_panel == 0)//関数開始時にPanalをスイッチオン, 使う文数をセット
             {
                 InputTexts = new string[use_st_count];
                 panel.SetActive(true);
                 set_panel++;
             }
 
-            for (int it = 0; it < use_st_count; it++)
+            for (int it = 0; it < use_st_count; it++)//使う文をDictionaryから読み込み・セット
             {
                 InputTexts[it] = dic[use_st_no_key[it]];
             }
@@ -184,6 +197,14 @@ public class ControlAllTexst : MonoBehaviour
                 {
                     displayedText = displayedText + InputTexts[st_num][textCharKazu];//
                     textCharKazu++;
+
+                    if (st_num == st_st_num && h==0)
+                    {
+                        inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
+                        check_existence++;
+                        h++;
+                    }
+
                     if (i < textCharKazu)
                     {
                         audioSource.PlayOneShot(sound);
@@ -206,28 +227,28 @@ public class ControlAllTexst : MonoBehaviour
                         {
                             displayedText = "";
                             textCharKazu = 0;
-                            st_num++;
                             k = 0;
                             Destroy(inst_blink);
                             i = 0;
-
-
-                            if (st_num == st_st_num)
-                            {
-                                inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
-
-                            }
-
+                            st_num++;
                             if (st_num == del_num)
                             {
                                 Destroy(inst_sort_image1);//画像の削除
+                                check_existence = 0;
                             }
+                            
                         }
 
 
                     }
                     else
                     {
+                        if (k == 0)
+                        {
+                            inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
+                            k++;
+                        }
+
                         if (click == true)
                         {
                             displayedText = "";
@@ -236,6 +257,14 @@ public class ControlAllTexst : MonoBehaviour
                             dousunnda = false;
                             st_num = 0;
                             i = 0;
+                            k = 0;
+                            Destroy(inst_blink);
+                            h =0;
+                            if (check_existence==1)
+                            {
+                                Destroy(inst_sort_image1);//画像の削除
+                                check_existence = 0;
+                            }
                             this.GetComponent<Text>().text = "";
                             panel.SetActive(false);
                             set_panel = 0;
@@ -264,7 +293,7 @@ public class ControlAllTexst : MonoBehaviour
     }
 
 
-    void stand_image_talk(int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
+    void stand_image_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)
     {
         if(set_background==0)
         {
@@ -296,6 +325,14 @@ public class ControlAllTexst : MonoBehaviour
                 {
                     displayedText = displayedText + InputTexts[st_num][textCharKazu];//
                     textCharKazu++;
+
+                    if (st_num == st_st_num && h == 0)
+                    {
+                        inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
+                        check_existence++;
+                        h++;
+                    }
+
                     if (i < textCharKazu)
                     {
                         audioSource.PlayOneShot(sound);
@@ -323,13 +360,6 @@ public class ControlAllTexst : MonoBehaviour
                             Destroy(inst_blink);
                             i = 0;
 
-
-                            if (st_num == st_st_num)
-                            {
-                                inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
-
-                            }
-
                             if (st_num == del_num)
                             {
                                 Destroy(inst_sort_image1);//画像の削除
@@ -340,6 +370,13 @@ public class ControlAllTexst : MonoBehaviour
                     }
                     else
                     {
+
+                        if (k == 0)
+                        {
+                            inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
+                            k++;
+                        }
+
                         if (click == true)
                         {
                             displayedText = "";
@@ -348,6 +385,14 @@ public class ControlAllTexst : MonoBehaviour
                             dousunnen = false;
                             st_num = 0;
                             i = 0;
+                            k = 0;
+                            Destroy(inst_blink);
+                            h = 0;
+                            if (check_existence == 1)
+                            {
+                                Destroy(inst_sort_image1);//画像の削除
+                                check_existence = 0;
+                            }
                             this.GetComponent<Text>().text = "";
                             panel.SetActive(false);
                             set_panel = 0;
