@@ -72,11 +72,25 @@ public class ControlAllTexst : MonoBehaviour
     public bool ChangeSceneTalk;
     public bool BattleSceneSentence;
 
-////////使用済みのアルファベット//////(k, i, f)
+    //練習用//
+    private Dictionary<int, string> tryRPG_dic;
+    bool cat = false;
+    bool ellipse = false;
+    bool sword = false;
+    bool ojisann=false;
+    bool ojisann1 = false;
+    int catf;
+    int ellipsef;
+    int swordf;
+    int ojisanf;
+
+    ////////使用済みのアルファベット//////(k, i, f)
 
     // Start is called before the first frame update
     void Start()
     {
+        //PlayerPrefs.DeleteAll();
+
         player = GameObject.Find("前向き");
 
         talk_background = GameObject.Find("talk_background");
@@ -85,10 +99,16 @@ public class ControlAllTexst : MonoBehaviour
         panel = GameObject.Find("Panel");
         panel.SetActive(false);//ゲーム開始時の暗転でPanelをstaticにする。暗転中にstaticにしなくてよい、何か良い方法がないですかね。一度ゲームを開始したら関係ないのですけど。
 
-        //tc = GameObject.Find("TouchCheck").GetComponent<TouchCheck>();
+        tc = GameObject.Find("TouchCheck").GetComponent<TouchCheck>();
 
-        flag1 = PlayerPrefs.GetInt("Key1");
-        flag2 = PlayerPrefs.GetInt("Key2");
+        PlayerPrefs.SetInt("cat", 0);
+        PlayerPrefs.SetInt("ellipse", 0);
+        PlayerPrefs.SetInt("sword", 0);
+        PlayerPrefs.SetInt("ojisan", 0);
+        ojisanf = PlayerPrefs.GetInt("ojisan");
+        ellipsef = PlayerPrefs.GetInt("ellipse");
+        swordf = PlayerPrefs.GetInt("sword");
+        catf = PlayerPrefs.GetInt("cat");
 
         sort_image1 = (GameObject)Resources.Load("Image");//挿入する画像のプレハブ選択。Animationを使用する場合はプレハブにセットして、プレハブのスクリプトから操作する。
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -120,7 +140,18 @@ public class ControlAllTexst : MonoBehaviour
             {5, "肥料になった鉱物の物語"}
         };
 
-
+        tryRPG_dic = new Dictionary<int, string>()
+        {
+            {1, "やあこんにちは、全ての人に話しかけてね"},
+            {2, "にゃー、ゴロゴロ、シャー！！！"},
+            {3, "パンツ一丁はさすがに寒いなー（笑"},
+            {4, "I'm a ellipse."},
+            {5, "......全てのNPCと話してきて、と言ったはずだけど。"},
+            {6, "よーし、やっと終わったか。" },
+            {7, "君の名前はなんていうんだい？"},
+            {8, "そうか、「前向き」というんだな" },
+            {9, "なぜだかわからないけど、なんだか前を向いている感じがするなあ" }
+        };
 
     }
 
@@ -130,28 +161,13 @@ public class ControlAllTexst : MonoBehaviour
 
 
 
-        //if ((flag1 == 1 && flag2 == 0) || p=0)
-        //{
-        if (NormalTalk == true)
-        {
-            tc = GameObject.Find("TouchCheck").GetComponent<TouchCheck>();
-            if (Input.GetKeyDown(KeyCode.R) && tc.isTouch)//ここのifに使う関数を直接入れるとなんかうまく動かない
-            {
-                dousunnda = true;
+        
 
-            }
-            if (dousunnda == true)//とりあえずここでワンクッション入れた
-            {
-                normal_talk(stage2_dic, 5, new int[] { 2, 1, 5, 3, 4 }, 0.04f, 0, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
-
-            }
-            textStop = false;
-        }
-        //}
+        /////////////一見関数の呼び出しに問題がないのに、「範囲外です」みたいなエラーが出るときは、bool値の変数に問題がある
 
         if (ChangeSceneTalk == true)
         {
-            tc = GameObject.Find("TouchCheck").GetComponent<TouchCheck>();
+            
             if (Input.GetKeyDown(KeyCode.E) && tc.isTouch)//ここのifに使う関数を直接入れるとなんかうまく動かない
             {
                 dousunnen = true;
@@ -163,13 +179,129 @@ public class ControlAllTexst : MonoBehaviour
 
             }
             textStop = false;
+
         }
 
+        
+        
+        if (NormalTalk == true)
+        {
+            ///ここにある2つのif文を1つに出来れば、同じboolの変数をUpdate内で使えるようになる。現状だと会話関数を一回使うごとに異なるboolの変数が必要。まだアイデアがない。
+            if (Input.GetKeyDown(KeyCode.E) && tc.cat=="cat")//ここのifに使う関数を直接入れるとなんかうまく動かない
+            {
+                cat = true;
+
+            }
+            if (cat == true)//とりあえずここでワンクッション入れた
+            {
+                normal_talk(tryRPG_dic,1, new int[] {2}, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                PlayerPrefs.SetInt("cat", 1);
+                catf = PlayerPrefs.GetInt("cat");
+            }
+            textStop = false;
+            
+            Debug.Log(catf);
+
+
+        }
+        
+
+
+        //if ((flag1 == 1 && flag2 == 0) || p=0)
+        //{
+        if (NormalTalk == true)
+        {
+
+            if (Input.GetKeyDown(KeyCode.E) && tc.sword=="sword")//ここのifに使う関数を直接入れるとなんかうまく動かない
+            {
+                sword = true;
+
+            }
+            if (sword == true)//とりあえずここでワンクッション入れた
+            {
+                normal_talk(tryRPG_dic, 1, new int[] { 3 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                PlayerPrefs.SetInt("sword", 1);
+                swordf = PlayerPrefs.GetInt("sword");
+            }
+            textStop = false;
+            
+            Debug.Log(swordf);
+        }
+        //}
+
+
+        //if ((flag1 == 1 && flag2 == 0) || p=0)
+        //{
+        if (NormalTalk == true)
+        {
+
+            if (Input.GetKeyDown(KeyCode.E) && tc.ellipse=="ellipse")//ここのifに使う関数を直接入れるとなんかうまく動かない
+            {
+                ellipse = true;
+
+            }
+            if (ellipse == true)//とりあえずここでワンクッション入れた
+            {
+                normal_talk(tryRPG_dic, 1, new int[] { 4 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                PlayerPrefs.SetInt("ellipse", 1);
+                ellipsef = PlayerPrefs.GetInt("ellipse");
+            }
+            textStop = false;
+            
+            Debug.Log(ellipsef);
+
+        }
+        //}
+
+
+        if (catf + ellipsef + swordf + ojisanf < 4)
+        {
+            if (NormalTalk == true)
+            {
+
+                if (Input.GetKeyDown(KeyCode.E) && tc.touch == "touch")//ここのifに使う関数を直接入れるとなんかうまく動かない
+                {
+                    ojisann = true;
+
+                }
+                if (ojisann == true)//とりあえずここでワンクッション入れた
+                {
+                   normal_talk(tryRPG_dic, 1, new int[] { 1 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                   PlayerPrefs.SetInt("ojisan", 1);
+                   ojisanf = PlayerPrefs.GetInt("ojisan");
+                }
+                textStop = false;
+               
+                Debug.Log(ojisanf);
+            }
+        }
+
+
+        if(catf==1 &&  ellipsef==1 && swordf==1 && ojisanf==1)
+        {
+            if (NormalTalk == true)
+            {
+
+                if (Input.GetKeyDown(KeyCode.E) && tc.touch == "touch")//ここのifに使う関数を直接入れるとなんかうまく動かない
+                {
+                    ojisann1 = true;
+
+                }
+                if (ojisann1 == true)//とりあえずここでワンクッション入れた
+                {
+                    normal_talk(tryRPG_dic, 4, new int[] { 6, 7, 8, 9 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+
+                }
+                textStop = false;
+                
+
+            }
+        }
 
     }
 
 
-    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
+    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
     {//画像挿入では、挿入したい～文目から-1をした数を入れてください。/////画像を消す～文目は-1をしなくて大丈夫です。
 
         if (textStop == false)
@@ -253,9 +385,16 @@ public class ControlAllTexst : MonoBehaviour
                         {
                             displayedText = "";
                             textCharKazu = 0;
-                            textStop = true;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
-                            dousunnda = false;
-                            st_num = 0;
+                            textStop = true;
+
+                            dousunnda = false;//タグ関連のboolを全部ここでfalseにリセットする
+                            cat = false;
+                            ellipse = false;
+                            sword = false;
+                            ojisann= false;
+                            ojisann1 = false;
+
+                            st_num = 0;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
                             i = 0;
                             k = 0;
                             Destroy(inst_blink);
@@ -293,9 +432,9 @@ public class ControlAllTexst : MonoBehaviour
     }
 
 
-    void stand_image_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)
-    {
-        if(set_background==0)
+    void stand_image_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
+    {//画像挿入では、挿入したい～文目から-1をした数を入れてください。/////画像を消す～文目は-1をしなくて大丈夫です。
+        if (set_background==0)
         {
             PlayerPosition.halt = true;
             InputTexts = new string[use_st_count];
@@ -381,8 +520,8 @@ public class ControlAllTexst : MonoBehaviour
                         {
                             displayedText = "";
                             textCharKazu = 0;
-                            textStop = true;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
-                            dousunnen = false;
+                            textStop = true;
+                            dousunnen = false;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
                             st_num = 0;
                             i = 0;
                             k = 0;

@@ -11,6 +11,7 @@ public class MoveHuman : MonoBehaviour
     private Animator anim = null;
     public float speed;
     private TouchCheck tc = null;
+    //GameObject mainCamera;
 
     private string position = null;
 
@@ -35,7 +36,7 @@ public class MoveHuman : MonoBehaviour
         Fade_Black = (GameObject)Resources.Load("Fade_Black");
         //PlayerPrefs.DeleteAll();
         Debug.Log(flag1);
-
+        //mainCamera = GameObject.Find("Main Camera");
         check = PlayerPrefs.GetInt("Check");
 
         if(check==0)
@@ -52,7 +53,7 @@ public class MoveHuman : MonoBehaviour
     void Update()
     {
         Vector2 pos = rb.position;
-
+        //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
         if (PlayerPosition.halt == false)
         {
             if (Input.GetKey(KeyCode.A))//ç∂à⁄ìÆ
@@ -63,6 +64,7 @@ public class MoveHuman : MonoBehaviour
                 anim.SetBool("to-front", false);
                 anim.SetBool("to-back", false);
                 pos += new Vector2(-speed * Time.deltaTime, 0.0f);
+                //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
             }
 
             if (Input.GetKey(KeyCode.D))//âEà⁄ìÆ
@@ -73,6 +75,7 @@ public class MoveHuman : MonoBehaviour
                 anim.SetBool("to-front", false);
                 anim.SetBool("to-back", false);
                 pos += new Vector2(speed * Time.deltaTime, 0.0f);
+                //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
             }
 
             if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.W) & !Input.GetKey(KeyCode.S))//í‚é~
@@ -92,6 +95,7 @@ public class MoveHuman : MonoBehaviour
                 anim.SetBool("to-front", false);
                 anim.SetBool("to-back", true);
                 pos += new Vector2(0.0f, speed * Time.deltaTime);
+                //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
             }
 
             if (Input.GetKey(KeyCode.S))//å„êi
@@ -102,6 +106,7 @@ public class MoveHuman : MonoBehaviour
                 anim.SetBool("to-front", true);
                 anim.SetBool("to-back", false);
                 pos += new Vector2(0.0f, -speed * Time.deltaTime);
+                //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
             }
 
             rb.position = pos;
@@ -124,6 +129,7 @@ public class MoveHuman : MonoBehaviour
                 }
 
             }
+            //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
         }
     }
 

@@ -5,21 +5,54 @@ using UnityEngine;
 public class TouchCheck : MonoBehaviour
 {
     public bool isTouch = false;
-    private string touchTag = "touch";
+    public string touch;
+    public string cat;
+    public string ellipse;
+    public string sword;
 
     void OnTriggerStay2D(Collider2D col)
     {
         if (col.tag == "touch")
         {
-            isTouch = true;
+            touch="touch";
+            //isTouch= true;
+        }
+        if (col.tag == "cat")
+        {
+            cat="cat";
+        }
+        if (col.tag == "ellipse")
+        {
+            ellipse = "ellipse";
+        }
+        if (col.tag == "sword")
+        {
+            sword="sword";
         }
     }
-
      void OnTriggerExit2D(Collider2D col)
     { 
         if (col.tag=="touch")
         {
-            isTouch = false;
+            touch=null;
+            //isTouch= false;
         }
+        if (col.tag == "cat")
+        {
+            cat=null;
+        }
+        if (col.tag == "ellipse")
+        {
+            ellipse=null;
+        }
+        if (col.tag == "sword")
+        {
+            sword=null;
+        }
+
     }
+
+
+
+    
 }
