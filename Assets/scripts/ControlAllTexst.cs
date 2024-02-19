@@ -43,7 +43,7 @@ public class ControlAllTexst : MonoBehaviour
     GameObject inst_sort_image1;
     private Canvas canvas = null;
     int check_existence = 0;
-    int h = 0;
+    int h = 0;//1回だけ生成するのに使う
 
     //文末を知らせる点滅オブジェクト
     GameObject blink;
@@ -56,6 +56,14 @@ public class ControlAllTexst : MonoBehaviour
     int i = 0;
     public AudioClip sound1;
 
+    //ボタン選択機能
+    GameObject ButtonSelect;
+    GameObject inst_ButtonSelect;
+    int b = 0;//1回だけ生成するのに使う, ボタンの状態の管理を行う, 生成した瞬間に変化する
+    int ba = 0;//ボタンをクリック(Destroy())した後に変化する
+    int bs = 0;//b,baを0に戻すのに使う
+    int bt_shokika = 0;
+
     //シーン移動時の暗転//用途によって使用するかしないかを「//」で分ける。　@@@@でこの関連の文を明記した
     public float black_time = 1.5f;
     private GameObject Fade_Black;
@@ -64,13 +72,13 @@ public class ControlAllTexst : MonoBehaviour
 
     //使用する文の入れ物
     private Dictionary<int, string> dic;
+    private Dictionary<int, string> yesBt_dic;
     private Dictionary<int, string> stage1_dic;
     private Dictionary<int, string> stage2_dic;
 
     //使用する関数の指定をするbool値群
     public bool NormalTalk;
     public bool ChangeSceneTalk;
-    public bool BattleSceneSentence;
 
     //練習用//
     private Dictionary<int, string> tryRPG_dic;
@@ -113,22 +121,26 @@ public class ControlAllTexst : MonoBehaviour
         sort_image1 = (GameObject)Resources.Load("Image");//挿入する画像のプレハブ選択。Animationを使用する場合はプレハブにセットして、プレハブのスクリプトから操作する。
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
 
-        blink = (GameObject)Resources.Load("Blink");
+        blink = (GameObject)Resources.Load("Blink");//点滅オブジェクト
 
-        audioSource = this.GetComponent<AudioSource>();
+        audioSource = this.GetComponent<AudioSource>();//文表示時のサウンド
 
-        Fade_Black = (GameObject)Resources.Load("Fade_Black");//@@@@
+        ButtonSelect= (GameObject)Resources.Load("ButtonSelect");
+
+        Fade_Black = (GameObject)Resources.Load("Fade_Black");//暗転
 
         
 
-
+        //Dictionaryには一応必ず一つ「""」を仕込むこと。Ex)使う文が4つ&&ボタンを使うのが4文目の場合、文生成のif文が終わってしまい会話が途切れてしまう。
+        //つまり、ボタン選択の文の後にもう1文残すことによってボタン選択で変化する会話ができる。言ってしまえば、最終文が「""」である必要はないのだけど、たぶん。
         stage1_dic = new Dictionary<int, string>()
         {
             {1, "N.P,Kは植物の成長に必要な三大栄養素だよ"},
             {2, "土壌に含まれるNPKと作物に含有されるNPKにはやはり差がある"},
             {3, "このうち、Nにおいて一番大きな差がある"},
             {4, "NKが外部から供給されるのに対して、Pは必要量が少ないものの外部から供給されることがほとんどない"},
-            {5, "つまり、植物が長期間栽培され続けると土壌中のPが不足してしまうんだ"}
+            {5, "つまり、植物が長期間栽培され続けると土壌中のPが不足してしまうんだ"},
+            {6, "" }
         };
 
         stage2_dic = new Dictionary<int, string>()
@@ -137,7 +149,8 @@ public class ControlAllTexst : MonoBehaviour
             {2, "土壌に含まれるNPKと作物に含有されるNPKにはやはり差がある"},
             {3, "新版　土壌学の基礎"},
             {4, "NKが外部から供給されるのに対して、Pは必要量が少ないものの外部から供給されることがほとんどない"},
-            {5, "肥料になった鉱物の物語"}
+            {5, "肥料になった鉱物の物語"},
+            {6, "" }
         };
 
         tryRPG_dic = new Dictionary<int, string>()
@@ -150,7 +163,8 @@ public class ControlAllTexst : MonoBehaviour
             {6, "よーし、やっと終わったか。" },
             {7, "君の名前はなんていうんだい？"},
             {8, "そうか、「前向き」というんだな" },
-            {9, "なぜだかわからないけど、なんだか前を向いている感じがするなあ" }
+            {9, "なぜだかわからないけど、なんだか前を向いている感じがするなあ" },
+            {10, "" }
         };
 
     }
@@ -182,8 +196,8 @@ public class ControlAllTexst : MonoBehaviour
 
         }
 
-        
-        
+
+        //引数の使い方(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定,ボタンは何文目？,Yesで使うDictionary,)
         if (NormalTalk == true)
         {
             ///ここにある2つのif文を1つに出来れば、同じboolの変数をUpdate内で使えるようになる。現状だと会話関数を一回使うごとに異なるboolの変数が必要。まだアイデアがない。
@@ -194,7 +208,7 @@ public class ControlAllTexst : MonoBehaviour
             }
             if (cat == true)//とりあえずここでワンクッション入れた
             {
-                normal_talk(tryRPG_dic,1, new int[] {2}, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                normal_talk(tryRPG_dic,4, new int[] {2,3,4,10}, 0.04f, 0, 1, 2, stage1_dic, 3, new int[] { 1,2,3});//画像変更をしない場合、st_st_numとdel_numを0にしてください
                 PlayerPrefs.SetInt("cat", 1);
                 catf = PlayerPrefs.GetInt("cat");
             }
@@ -219,7 +233,7 @@ public class ControlAllTexst : MonoBehaviour
             }
             if (sword == true)//とりあえずここでワンクッション入れた
             {
-                normal_talk(tryRPG_dic, 1, new int[] { 3 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                normal_talk(tryRPG_dic, 1, new int[] { 3 }, 0.04f, 5, 5, 10, stage1_dic, 3, new int[] { 1, 2, 3 });//画像変更をしない場合、st_st_numとdel_numを0にしてください
                 PlayerPrefs.SetInt("sword", 1);
                 swordf = PlayerPrefs.GetInt("sword");
             }
@@ -242,7 +256,7 @@ public class ControlAllTexst : MonoBehaviour
             }
             if (ellipse == true)//とりあえずここでワンクッション入れた
             {
-                normal_talk(tryRPG_dic, 1, new int[] { 4 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                normal_talk(tryRPG_dic, 1, new int[] { 4 }, 0.04f, 5, 5, 10, stage1_dic, 3, new int[] { 1, 2, 3 });//画像変更をしない場合、st_st_numとdel_numを0にしてください
                 PlayerPrefs.SetInt("ellipse", 1);
                 ellipsef = PlayerPrefs.GetInt("ellipse");
             }
@@ -266,7 +280,7 @@ public class ControlAllTexst : MonoBehaviour
                 }
                 if (ojisann == true)//とりあえずここでワンクッション入れた
                 {
-                   normal_talk(tryRPG_dic, 1, new int[] { 1 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                   normal_talk(tryRPG_dic, 1, new int[] { 1 }, 0.04f, 5, 5, 10, stage1_dic, 3, new int[] { 1, 2, 3 });//画像変更をしない場合、st_st_numとdel_numを0にしてください
                    PlayerPrefs.SetInt("ojisan", 1);
                    ojisanf = PlayerPrefs.GetInt("ojisan");
                 }
@@ -289,7 +303,7 @@ public class ControlAllTexst : MonoBehaviour
                 }
                 if (ojisann1 == true)//とりあえずここでワンクッション入れた
                 {
-                    normal_talk(tryRPG_dic, 4, new int[] { 6, 7, 8, 9 }, 0.04f, 5, 5);//画像変更をしない場合、st_st_numとdel_numを0にしてください
+                    normal_talk(tryRPG_dic, 4, new int[] { 6, 7, 8, 9 }, 0.04f, 5, 5, 10, stage1_dic, 3, new int[] { 1, 2, 3 });//画像変更をしない場合、st_st_numとdel_numを0にしてください
 
                 }
                 textStop = false;
@@ -301,135 +315,211 @@ public class ControlAllTexst : MonoBehaviour
     }
 
 
-    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
-    {//画像挿入では、挿入したい～文目から-1をした数を入れてください。/////画像を消す～文目は-1をしなくて大丈夫です。
 
-        if (textStop == false)
-        {
-            if (set_panel == 0)//関数開始時にPanalをスイッチオン, 使う文数をセット
+
+
+
+
+    //引数の使い方(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定,ボタンは何文目？,Yesで使うDictionary,)
+    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num, int bt_st_num, Dictionary<int, string> yesBt_dic, int yesBt_use_st_count, int[] yesBt_use_st_no_key)
+    {//画像挿入では、挿入したい～文目から-1をした数を入れてください。ボタンも同様です。/////画像を消す～文目は-1をしなくて大丈夫です。
+
+            if (textStop == false)
             {
-                InputTexts = new string[use_st_count];
-                panel.SetActive(true);
-                set_panel++;
-            }
-
-            for (int it = 0; it < use_st_count; it++)//使う文をDictionaryから読み込み・セット
-            {
-                InputTexts[it] = dic[use_st_no_key[it]];
-            }
-            
-
-
-            displayedTextSpeed += Time.deltaTime;
-            if (displayedTextSpeed > st_speed)
-            {
-                this.GetComponent<Text>().text = displayedText;
-                displayedTextSpeed = 0.0f;
-                if (textCharKazu != InputTexts[st_num].Length)//Update毎に文の文字を1文字ずつdisplayedTextに入れる
+                if (set_panel == 0)//関数開始時にPanalをスイッチオン, 使う文数をセット
                 {
-                    displayedText = displayedText + InputTexts[st_num][textCharKazu];//
-                    textCharKazu++;
+                    InputTexts = new string[use_st_count];
+                    panel.SetActive(true);
+                    set_panel++;
+                }
 
-                    if (st_num == st_st_num && h==0)
+                if(b==0 && ba==0)//ボタン選択をしないときの文生成
+                {
+                    for (int it = 0; it < use_st_count; it++)//使う文をDictionaryから読み込み・セット
                     {
-                        inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
-                        check_existence++;
-                        h++;
-                    }
+                        InputTexts[it] = dic[use_st_no_key[it]];
 
-                    if (i < textCharKazu)
-                    {
-                        audioSource.PlayOneShot(sound);
-                        i++;
                     }
                 }
-                else
+                if(b==1 && ba==1)//ボタン選択をするときの文生成
                 {
-                    if (st_num != InputTexts.Length - 1)//入力した文の数-1になるまでst_num++して文の移動
+                    if (bt_shokika == 0)//ボタンを押されたと場合、初めに1回だけいろいろ値をセット, リセットしてあげる
                     {
-
-                        if (k == 0)
-                        {
-                            inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
-                            k++;
-                        }
-
-
-                        if (click == true)
-                        {
-                            displayedText = "";
-                            textCharKazu = 0;
-                            k = 0;
-                            Destroy(inst_blink);
-                            i = 0;
-                            st_num++;
-                            if (st_num == del_num)
-                            {
-                                Destroy(inst_sort_image1);//画像の削除
-                                check_existence = 0;
-                            }
-                            
-                        }
-
-
+                        InputTexts = new string[yesBt_use_st_count];
+                        use_st_count = yesBt_use_st_count;
+                        textCharKazu = 0;
+                        st_num = 0;
+                        displayedText = "";
+                        i = 0;
+                        k = 0;
+                        h = 0;
+                        bs = 1;
+                        bt_shokika++;
                     }
-                    else
+                    for (int it = 0; it < yesBt_use_st_count; it++)//使う文をDictionaryから読み込み・セット
                     {
-                        if (k == 0)
-                        {
-                            inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
-                            k++;
-                        }
-
-                        if (click == true)
-                        {
-                            displayedText = "";
-                            textCharKazu = 0;
-                            textStop = true;
-
-                            dousunnda = false;//タグ関連のboolを全部ここでfalseにリセットする
-                            cat = false;
-                            ellipse = false;
-                            sword = false;
-                            ojisann= false;
-                            ojisann1 = false;
-
-                            st_num = 0;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
-                            i = 0;
-                            k = 0;
-                            Destroy(inst_blink);
-                            h =0;
-                            if (check_existence==1)
-                            {
-                                Destroy(inst_sort_image1);//画像の削除
-                                check_existence = 0;
-                            }
-                            this.GetComponent<Text>().text = "";
-                            panel.SetActive(false);
-                            set_panel = 0;
-
-
-
-                        }
+                        InputTexts[it] = yesBt_dic[yesBt_use_st_no_key[it]];
                     }
                 }
 
 
-                click = false;
+                displayedTextSpeed += Time.deltaTime;
+                if (displayedTextSpeed > st_speed)
+                {
+                    this.GetComponent<Text>().text = displayedText;
+                    displayedTextSpeed = 0.0f;
+                    if (textCharKazu != InputTexts[st_num].Length)//Update毎に文の文字を1文字ずつdisplayedTextに入れる
+                    {
+                        displayedText = displayedText + InputTexts[st_num][textCharKazu];//
+                        textCharKazu++;
+
+                        if (st_num == st_st_num && h == 0)
+                        {
+                            inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
+                            check_existence++;//画像がヒエラルキーに存在することをチェックしておきたいもの
+                            h++;
+                        }
+
+                        if (i < textCharKazu)
+                        {
+                            audioSource.PlayOneShot(sound);
+                            i++;
+                        }
+                    }
+                    else//TextCharKazuが使う分の文字数と同じになった場合
+                    {
+                        if (st_num != InputTexts.Length - 1)//入力した文の数-1になるまでst_num++して文の移動
+                        {
+
+                            if (k == 0)
+                            {
+                                inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
+                                k++;
+                            }
+
+                            if (st_num == bt_st_num && b == 0)//////////////////////////////////////頭尾の文以外のボタン操作////////////////////////////////////////////////////////////
+                            {
+                                inst_ButtonSelect = Instantiate(ButtonSelect, new Vector3(398.5f, 154.5f, 0.0f), Quaternion.identity, canvas.transform);
+                                b++;
+                            }
+
+                            if (click == true)
+                            {
+                                displayedText = "";
+                                textCharKazu = 0;
+                                k = 0;
+                                Destroy(inst_blink);
+                                i = 0;
+                                st_num++;
+                                if (st_num == del_num)
+                                {
+                                    Destroy(inst_sort_image1);//画像の削除
+                                    check_existence = 0;
+                                }
+                                if(b==1)
+                                {
+                                    ba = 1;
+                                }
+
+
+                        }
+
+                        }
+                        else
+                        {
+                            if (k == 0)//「文末に生成されない問題」を解決するために書いてある
+                            {
+                                inst_blink = Instantiate(blink, new Vector3(750f, 50f, 0.0f), Quaternion.identity, canvas.transform);
+                                k++;
+                            }
+
+                            if (st_num == bt_st_num && b == 0)//「文末に生成されない問題」を解決するために書いてある//////////////////////////////////////////////////////////////////////////////////////////////////
+                            {
+                                inst_ButtonSelect = Instantiate(ButtonSelect, new Vector3(398.5f, 154.5f, 0.0f), Quaternion.identity, canvas.transform);
+                                b++;
+                            }
+
+                            if (click == true)
+                            {
+                                //if (b == 1)
+                                //{
+                                //Destroy(inst_ButtonSelect);
+                                //b = 0;
+                                //}
+                                displayedText = "";
+                                textCharKazu = 0;
+                                textStop = true;
+
+                                dousunnda = false;//タグ関連のboolを全部ここでfalseにリセットする
+                                cat = false;
+                                ellipse = false;
+                                sword = false;
+                                ojisann = false;
+                                ojisann1 = false;
+
+                                st_num = 0;//ここで各値を元に戻すことで、再度関数を呼び出したときも初めからちゃんと動く
+                                i = 0;
+                                k = 0;
+                                Destroy(inst_blink);
+                                //b = 0;///////////最後の文終了後にbを初期化してる////////////////////////////////////////////////////////////////////
+                                //ba = 1;
+                                h = 0;
+                                if (check_existence == 1)
+                                {
+                                    Destroy(inst_sort_image1);//画像の削除
+                                    check_existence = 0;
+                                }
+                                this.GetComponent<Text>().text = "";
+                                panel.SetActive(false);
+                                set_panel = 0;
+                                bt_shokika = 0;
+                                if(b==1)
+                                {
+                                    ba = 1;
+                                }
+                                if(bs==1)
+                                {
+                                b = 0;
+                                ba = 0;
+                                bs = 0;
+                                }
+                                Debug.Log(b);
+                                Debug.Log(ba);
+                        }
+                        }
+                    }
+                    click = false;
+                    Debug.Log("koko");
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+
+                    if (b != 0)///////////////////////////////////////////////////////////
+                    {
+                        PlayerPrefs.SetInt("button", 2);
+                        int bt = PlayerPrefs.GetInt("button");
+                        Debug.Log(bt);
+                    }
+                    Destroy(inst_ButtonSelect);///////////////////////////////////////////////
+                    //ba = 1;
+                    click = true;
+                    audioSource.PlayOneShot(sound1);
+                    Destroy(inst_blink);
+                    k = 0;
+                    Debug.Log("koko");
+
+                }
+                Debug.Log("koko");
             }
-            if (Input.GetMouseButtonDown(0))
-            {
-                click = true;
-                audioSource.PlayOneShot(sound1);
-                Destroy(inst_blink);
-                k = 0;
-
-
-            }
-        }
-
+        Debug.Log("koko");
 
     }
+
+
+
+
+
+
 
 
     void stand_image_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int st_st_num, int del_num)//(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定)
