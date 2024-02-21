@@ -35,7 +35,6 @@ public class MoveHuman : MonoBehaviour
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
         Fade_Black = (GameObject)Resources.Load("Fade_Black");
         //PlayerPrefs.DeleteAll();
-        Debug.Log(flag1);
         //mainCamera = GameObject.Find("Main Camera");
         check = PlayerPrefs.GetInt("Check");
 
@@ -45,8 +44,7 @@ public class MoveHuman : MonoBehaviour
             PlayerPrefs.SetInt("Check", 1);
         }
         flag1 = PlayerPrefs.GetInt("Key2");
-        Debug.Log(flag1);
-        StartCoroutine(FadeIn1());
+        //StartCoroutine(FadeIn1());
     }
 
     // Update is called once per frame
@@ -111,24 +109,24 @@ public class MoveHuman : MonoBehaviour
 
             rb.position = pos;
 
-            if (Input.GetKeyDown(KeyCode.Space) && tc.isTouch)
-            {
-                StartCoroutine(FadeIn());
-                PlayerPosition.position = pos;
+            //if (Input.GetKeyDown(KeyCode.Space) && tc.isTouch)
+            //{
+               //StartCoroutine(FadeIn());
+               //PlayerPosition.position = pos;
                 //PlayerPrefs.SetInt("Check1",1)
-                Debug.Log(flag1);
-                if (flag1 == 0)
-                {
-                    PlayerPrefs.SetInt("Key2", 1);
-                    PlayerPrefs.Save();
-                }
-                else
-                {
-                    PlayerPrefs.SetInt("Key2", 2);
-                    PlayerPrefs.Save();
-                }
+                //Debug.Log(flag1);
+                //if (flag1 == 0)
+                //{
+                    //PlayerPrefs.SetInt("Key2", 1);
+                    //PlayerPrefs.Save();
+                //}
+                //else
+                //{
+                    //PlayerPrefs.SetInt("Key2", 2);
+                    //PlayerPrefs.Save();
+                //}
 
-            }
+            //}
             //mainCamera.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, 0);
         }
     }
