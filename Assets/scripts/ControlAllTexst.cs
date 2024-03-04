@@ -35,13 +35,25 @@ public class ControlAllTexst : MonoBehaviour
     //接触を取得
     private TouchCheck tc = null;
 
-    //フォントサイズ変更機能
-    Text text = null;
-    int fontsize = 20;
-    int set_fontsize = 40;
-    int reset_fontsize = 20;
-    int change_st_num = 50000;
-    int change_char_num = 60000;
+    //フォントサイズ変更機能//変更したい量でここは長くなる
+    int set_fontsize = 28;
+    int change_st_num1 = 50000;
+    int change_st_num2 = 50000;
+    int change_st_num3 = 50000;
+    int change_st_num4 = 50000;
+    int change_char_num1 = 60000;
+    int change_char_num2 = 60000;
+    int change_char_num3 = 60000;
+    int change_char_num4 = 60000;
+    int normal_fontsize = 20;
+    int e = 0;//通常のフォントサイズに戻すときに使う
+    int normal_yes_no = 0;//normal=0//yes==1//no==2//
+
+    //文字を動かす
+    TextGenerator textGenerator = null;
+    Vector2 extents;
+    Vector2 newplace;
+
 
     //フラグ関係
     public int flag1;
@@ -123,10 +135,6 @@ public class ControlAllTexst : MonoBehaviour
 
         tc = GameObject.Find("TouchCheck").GetComponent<TouchCheck>();//会話するための当たり判定
 
-        text = this.GetComponent<Text>();
-        fontsize = text.fontSize;
-        Debug.Log(fontsize);
-
         PlayerPrefs.SetInt("cat", 0);////ここは製作中に何度でもフラグを使って会話ができるようにStart()で全て１回統一している。
         PlayerPrefs.SetInt("ellipse", 0);
         PlayerPrefs.SetInt("sword", 0);
@@ -135,6 +143,12 @@ public class ControlAllTexst : MonoBehaviour
         ellipsef = PlayerPrefs.GetInt("ellipse");
         swordf = PlayerPrefs.GetInt("sword");
         catf = PlayerPrefs.GetInt("cat");
+
+        textGenerator = new TextGenerator();//TextGeneraterクラスを使う//特定の文字の位置を取得したい
+        extents = this.GetComponent<RectTransform>().rect.size;//.rectでRectTransformのposition, dimention, rotation, scaleに入り込み、.sizeでrectangle(長方形)のwidthとheightを取得
+        //textGenerator.Populate(this.GetComponent<Text>().text, this.GetComponent<Text>().GetGenerationSettings(extents));//Public TextGenerationSettings GetGenerationSettings(Vector2) パラメタのmojinobashoを使い、返り値としてTextGenerationSettingsを返す。Populationで指定した文字列のverticsを取得してる。
+
+
 
         sort_image1 = (GameObject)Resources.Load("Image");//挿入する画像のプレハブ選択。Animationを使用する場合はプレハブにセットして、プレハブのスクリプトから操作する。
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -212,12 +226,30 @@ public class ControlAllTexst : MonoBehaviour
             if (cat == true)//とりあえずここでワンクッション入れた
             {
                 whether_use_stand = 1;//立ち絵での会話をするなら1, しないなら0
-                change_st_num = 1;
-                change_char_num = 3;
+
+                change_st_num1 = 0;//フォントサイズを変更する文は何文目？(ただし-1をした値)。
+                change_st_num2 = 2;
+                change_st_num3 = 0;
+                change_st_num4 = 0;
+                change_char_num1 = 0;//フォントサイズを変更する文字は何文字目？(ただし-1をした値)。
+                change_char_num2 = 1;
+                change_char_num3 = 4;
+                change_char_num4 = 2;
+
                 normal_talk(tryRPG_dic,4, new int[] {2,3,4,10}, 0.04f, 0, 1, 2, tryRPG_dic, 1, new int[] { 11}, tryRPG_dic, 1, new int[] {12});//画像変更をしない場合、st_st_numとdel_numを0にしてください
+
                 PlayerPrefs.SetInt("cat", 1);
                 catf = PlayerPrefs.GetInt("cat");
-                
+
+                change_st_num1 = 50000;//フォントサイズを変更する文は何文目？(ただし-1をした値)。
+                change_st_num2 = 50000;
+                change_st_num3 = 50000;
+                change_st_num4 = 50000;
+                change_char_num1 = 50000;//フォントサイズを変更する文字は何文字目？(ただし-1をした値)。
+                change_char_num2 = 50000;
+                change_char_num3 = 50000;
+                change_char_num4 = 50000;
+
                 if (d==1 & b==0)
                 {
                     PlayerPosition.yesClick = false;//staticのスクリプトPlayerPositionでボタンの状態を保存しているモノを元に戻してあげる
@@ -378,6 +410,7 @@ public class ControlAllTexst : MonoBehaviour
                             h = 0;
                             bs = 1;
                             bt_shokika++;
+                            normal_yes_no = 1;
                         }
 
                         for (int it = 0; it < yesBt_use_st_count; it++)//使う文をDictionaryから読み込み・セット
@@ -401,6 +434,7 @@ public class ControlAllTexst : MonoBehaviour
                             h = 0;
                             bs = 1;
                             bt_shokika++;
+                            normal_yes_no = 2;
                         }
 
                         for (int it = 0; it < noBt_use_st_count; it++)//使う文をDictionaryから読み込み・セット
@@ -420,26 +454,36 @@ public class ControlAllTexst : MonoBehaviour
 
                     if (textCharKazu != InputTexts[st_num].Length)//Update毎に文の文字を1文字ずつdisplayedTextに入れる
                     {
-                        if (st_num == change_st_num)
+
+                    textGenerator.Populate(displayedText, this.GetComponent<Text>().GetGenerationSettings(extents));
+
+                    if (textGenerator.characterCount > 5)
+                    {
+                        UICharInfo uiCharInfo = textGenerator.characters[3];
+                        Vector2 mojinobasho = uiCharInfo.cursorPos / this.GetComponent<Text>().pixelsPerUnit;
+                        Debug.Log(mojinobasho);
+                        uiCharInfo.cursorPos += new Vector2(13 * this.GetComponent<Text>().pixelsPerUnit, 100 * this.GetComponent<Text>().pixelsPerUnit);
+
+                    }
+
+                    change_fontsize();//変更する箇所が多いと見にくくなりそうだったので、分けました。
+
+                        if (e==0)//通常のフォントサイズでの文生成
                         {
-                            if (textCharKazu == 3)
-                            {
-                            text.fontSize = 40;
-                            Debug.Log(888);
-                            }
+                            displayedText = displayedText + "<size=" + normal_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";//
                         }
 
-                        if (st_num == change_st_num)
-                        {
-                            if (textCharKazu == 5)
-                            {
-                            text.fontSize = reset_fontsize;
-                            }
-                        }
+                        e = 0;
 
 
-                    displayedText = displayedText + InputTexts[st_num][textCharKazu];//
-                        textCharKazu++;
+
+
+                        
+
+
+
+                    //displayedText = displayedText + "<size=" + normal_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";//
+                    textCharKazu++;
 
                         if (st_num == st_st_num && h == 0)
                         {
@@ -662,4 +706,69 @@ public class ControlAllTexst : MonoBehaviour
        //SceneManager.LoadScene("talk_scene");//シーン移動
 
     }
+
+
+
+    void change_fontsize()//フォントサイズを変更するときの文字生成関数
+    {
+        if (normal_yes_no == 0)//ボタン選択をしないとき・する前のフォントサイズ指定
+        {
+            if (st_num == change_st_num1)
+            {
+                if (textCharKazu == change_char_num1)
+                {
+                    displayedText = displayedText + "<size=" + set_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";
+                    e++;
+                    
+                }
+            }
+
+            if (st_num == change_st_num1)
+            {
+                if (textCharKazu == 4)
+                {
+                    displayedText = displayedText + "<size=" + set_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";
+                    e++;
+
+                }
+            }
+
+            if (st_num == change_st_num2)
+            {
+                if (textCharKazu == change_char_num2)
+                {
+                    displayedText = displayedText + "<size=" + set_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";
+                    e++;
+                }
+            }
+        }
+
+        if (normal_yes_no == 1)//yesの場合//ボタンの選択肢が増えた場合は、これをコピペして適宜追加・変更してください。
+        {
+            if (st_num == change_st_num3)
+            {
+                if (textCharKazu == change_char_num3)
+                {
+                    displayedText = displayedText + "<size=" + set_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";
+                    e++;
+                }
+            }
+        }
+        
+        if (normal_yes_no==2)//noの場合
+        {
+            if (st_num == change_st_num4)
+            {
+                if (textCharKazu == change_char_num4)
+                {
+                    displayedText = displayedText + "<size=" + set_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";
+                    e++;
+                }
+            }
+        }
+  
+    }
+
+    
+
 }
