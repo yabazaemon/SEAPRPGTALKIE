@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.AddressableAssets;
 
 public class ControlAllTexst : MonoBehaviour
 {
-
+    public int talk_finish=0;
     bool dousunnen = false;
     bool dousunnda = false;
-    private Rigidbody2D rb = null;
-    GameObject player = null;
+    //private Rigidbody2D rb = null;
+    //GameObject player = null;
 
     //立ち絵での会話で使うもので使うもの
     GameObject talk_background;
@@ -35,19 +36,15 @@ public class ControlAllTexst : MonoBehaviour
     //接触を取得
     private TouchCheck tc = null;
 
-    //フォントサイズ変更機能//変更したい量でここは長くなる
+    //フォントサイズ変更機能
     int normal_fontsize = 20;
     int e = 0;//通常のフォントサイズに戻すときに使う
     int normal_yes_no = 0;//normal=0//yes==1//no==2//
-    fontsize_prameters prameters;
+    public Fontsize_parameters fontsize_parameters;
     int check_st_num = 0;//change_fontsize()で使用
     int check_char_num = 0;//change_fontsize()で使用
-    int once = 0;//構造体の中の変数を1回だけ、関数呼び出し直前に値を変えるために使用
+    public int once = 0;//構造体の中の変数を1回だけ、関数呼び出し直前に値を変えるために使用
 
-    //文字を動かす
-    //TextGenerator textGenerator = null;
-    //Vector2 extents;
-    //Vector2 newplace;
 
     //フラグ関係
     public int flag1;
@@ -70,7 +67,7 @@ public class ControlAllTexst : MonoBehaviour
     GameObject[][] setti;
     int bunbun = 0;
     int del_img_retsu = 0;
-    image_ctrl_parameters image_Ctrl_Parameters;
+    public image_ctrl_parameters image_Ctrl_Parameters;
     int count_gyo = 0;
     int shokkika = 0;
     int ikkaidake = 0;
@@ -102,17 +99,14 @@ public class ControlAllTexst : MonoBehaviour
     int f = 0;
 
     //使用する文の入れ物
-    private Dictionary<int, string> dic;
-    private Dictionary<int, string> yesBt_dic;
-    private Dictionary<int, string> noBt_dic;
     private Dictionary<int, string> stage1_dic;
     private Dictionary<int, string> stage2_dic;
 
     //使用する関数の指定をするbool値群
-    public bool NormalTalk;
+    //public bool NormalTalk;
 
     //練習用//フラグ、Dictionaryを含む//
-    private Dictionary<int, string> tryRPG_dic;
+    public Dictionary<int, string> tryRPG_dic;
     bool cat = false;
     bool ellipse = false;
     bool sword = false;
@@ -129,19 +123,12 @@ public class ControlAllTexst : MonoBehaviour
     GameObject g3 = null;
     GameObject g4 = null;
 
-    ////////使用済みのアルファベット//////(k, i, f, d)
+
+    ////////使用済みのアルファベット(グローバルな奴)//////(k, i, f, d)
 
     // Start is called before the first frame update
     void Start()
     {
-        //image_ctrl_parameters image_Ctrl_Parameters = new image_ctrl_parameters();
-        //image_ctrl_parameters image_Ctrl_Parameters = new image_ctrl_parameters();
-
-        g1 = (GameObject)Resources.Load("前向き");
-        g2 = (GameObject)Resources.Load("右向き");
-        g3 = (GameObject)Resources.Load("左向き");
-        g4 = (GameObject)Resources.Load("後ろ向き");
-
 
         image_Ctrl_Parameters.st_st_num = new int[] { 0, 1 };
         image_Ctrl_Parameters.img_position = new Vector3[][] { new Vector3[] { new Vector3(672f, 230f, 0.0f), new Vector3(672f, 230f, 0.0f) }, new Vector3[] { new Vector3(672f, 230f, 0.0f), new Vector3(672f, 230f, 0.0f) } };
@@ -166,28 +153,24 @@ public class ControlAllTexst : MonoBehaviour
 
 
 
-        prameters.change_use_st_count = 3;
-        //prameters.normal_change_st_num = new int[] { 0, 1, 2};
-        prameters.max_change_char_count = 3;
-        prameters.normal_change_char_num = new int[][] { new int[] { 0, 2, 3 }, new int[] { 0, 1, 5 }, new int[] { 0, 2 ,4 } };//new int[][] { new int[] { 1, 2, 6 }, new int[] { 0, 1, 3 }, new int[] { 1, 2, 3 } };
-        prameters.change_fontsize = new int[][] { new int[] { 10, 20, 30 }, new int[] { 5, 29, 4 }, new int[] { 1, 2 ,3 } };
+        fontsize_parameters.change_use_st_count = 3;
+        fontsize_parameters.max_change_char_count = 3;
+        fontsize_parameters.normal_change_char_num = new int[][] { new int[] { 0, 2, 3 }, new int[] { 0, 1, 5 }, new int[] { 0, 2 ,4 } };//new int[][] { new int[] { 1, 2, 6 }, new int[] { 0, 1, 3 }, new int[] { 1, 2, 3 } };
+        fontsize_parameters.change_fontsize = new int[][] { new int[] { 10, 20, 30 }, new int[] { 5, 29, 4 }, new int[] { 1, 2 ,3 } };
 
-        prameters.Ychange_use_st_count = 1;
-        //prameters.yes_change_st_num = new int[] { 0 };
-        prameters.Ymax_change_char_count = 1;
-        prameters.yes_change_char_num = new int[][] { new int[] { 0 } };
-        prameters.Ychange_fontsize = new int[][] { new int[] { 20 } };
+        fontsize_parameters.Ychange_use_st_count = 1;
+        fontsize_parameters.Ymax_change_char_count = 1;
+        fontsize_parameters.yes_change_char_num = new int[][] { new int[] { 0 } };
+        fontsize_parameters.Ychange_fontsize = new int[][] { new int[] { 20 } };
 
-        prameters.Nchange_use_st_count = 1;
-        //prameters.no_change_st_num = new int[] { 0 };
-        prameters.Nmax_change_char_count = 1;
-        prameters.no_change_char_num = new int[][] { new int[] { 0 } };
-        prameters.Nchange_fontsize = new int[][] { new int[] { 20 } };
+        fontsize_parameters.Nchange_use_st_count = 1;
+        fontsize_parameters.Nmax_change_char_count = 1;
+        fontsize_parameters.no_change_char_num = new int[][] { new int[] { 0 } };
+        fontsize_parameters.Nchange_fontsize = new int[][] { new int[] { 20 } };
 
 
 
 
-        player = GameObject.Find("前向き");
 
         talk_background = GameObject.Find("talk_background");//
         image_talk_background = talk_background.GetComponent<Image>();//下のPanelと同じことをしている
@@ -205,10 +188,6 @@ public class ControlAllTexst : MonoBehaviour
         ellipsef = PlayerPrefs.GetInt("ellipse");
         swordf = PlayerPrefs.GetInt("sword");
         catf = PlayerPrefs.GetInt("cat");
-
-        //textGenerator = new TextGenerator();//TextGeneraterクラスを使う//特定の文字の位置を取得したい
-        //extents = this.GetComponent<RectTransform>().rect.size;//.rectでRectTransformのposition, dimention, rotation, scaleに入り込み、.sizeでrectangle(長方形)のwidthとheightを取得
-        //textGenerator.Populate(this.GetComponent<Text>().text, this.GetComponent<Text>().GetGenerationSettings(extents));//Public TextGenerationSettings GetGenerationSettings(Vector2) パラメタのmojinobashoを使い、返り値としてTextGenerationSettingsを返す。Populationで指定した文字列のverticsを取得してる。
 
         sort_image1 = (GameObject)Resources.Load("Image");//挿入する画像のプレハブ選択。Animationを使用する場合はプレハブにセットして、プレハブのスクリプトから操作する。
         canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
@@ -276,58 +255,77 @@ public class ControlAllTexst : MonoBehaviour
         //引数の使い方(使用するDictionary, 使用する文数, 使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定,ボタンは何文目？,Yesで使うDictionary,)
 
 
-       
-            ///ここにある2つのif文を1つに出来れば、同じboolの変数をUpdate内で使えるようになる。現状だと会話関数を一回使うごとに異なるboolの変数が必要。まだアイデアがない。
-            if (Input.GetKeyDown(KeyCode.E) && tc.cat == "cat")//ここのifに使う関数を直接入れるとなんかうまく動かない
-            {
-                cat = true;
+        if (Input.GetKeyDown(KeyCode.E) && tc.cat == "cat")//ここのifに使う関数を直接入れるとなんかうまく動かない
+        {
+            cat = true;
+        }
+        if (cat == true)//とりあえずここでワンクッション入れた
+        {
+            //whether_use_stand = 1;//立ち絵での会話をするなら1, しないなら0
+            var g5 = Addressables.LoadAssetAsync<GameObject>("前向き");
+            var g6 = Addressables.LoadAssetAsync<GameObject>("後ろ向き");
+            var g7 = Addressables.LoadAssetAsync<GameObject>("右向き");
+            var g8 = Addressables.LoadAssetAsync<GameObject>("左向き");
 
+            if (once == 0)//構造体のなかの変数を1度だけ変更する
+            {
+                g5.Completed += op5 =>
+                {
+                    g6.Completed += op6 =>
+                    {
+                        g7.Completed += op7 =>
+                        {
+                            g8.Completed += op8 =>
+                            {
+                                image_Ctrl_Parameters.TansuOfImage = new GameObject[][] { new GameObject[] { op5.Result, op6.Result }, new GameObject[] { op7.Result, op8.Result } };
+                                image_Ctrl_Parameters.YTansuOfImage = new GameObject[][] { new GameObject[] { op5.Result, op6.Result } };
+                                image_Ctrl_Parameters.NTansuOfImage = new GameObject[][] { new GameObject[] { op5.Result, op6.Result } };
+                            };
+                        };
+                    };
+                };
+
+                fontsize_parameters.change_use_st_count = 3;
+                fontsize_parameters.normal_change_st_num = new int[] { 0, 1, 2 };
+                fontsize_parameters.max_change_char_count = 3;
+                fontsize_parameters.normal_change_char_num = new int[][] { new int[] { 0, 2, 3 }, new int[] { 0, 1, 5 }, new int[] { 0, 2, 4 } };//new int[][] { new int[] { 1, 2, 6 }, new int[] { 0, 1, 3 }, new int[] { 1, 2, 3 } };
+                fontsize_parameters.change_fontsize = new int[][] { new int[] { 10, 20, 30 }, new int[] { 5, 29, 4 }, new int[] { 1, 2, 3 } };
+
+                fontsize_parameters.Ychange_use_st_count = 1;
+                fontsize_parameters.yes_change_st_num = new int[] { 0 };
+                fontsize_parameters.Ymax_change_char_count = 1;
+                fontsize_parameters.yes_change_char_num = new int[][] { new int[] { 0 } };
+                fontsize_parameters.Ychange_fontsize = new int[][] { new int[] { 30 } };
+
+                fontsize_parameters.Nchange_use_st_count = 1;
+                fontsize_parameters.no_change_st_num = new int[] { 0 };
+                fontsize_parameters.Nmax_change_char_count = 1;
+                fontsize_parameters.no_change_char_num = new int[][] { new int[] { 0 } };
+                fontsize_parameters.Nchange_fontsize = new int[][] { new int[] { 30 } };
+
+                once++;
             }
-            if (cat == true)//とりあえずここでワンクッション入れた
+            if(image_Ctrl_Parameters.TansuOfImage[0][0] != null)
             {
-                //whether_use_stand = 1;//立ち絵での会話をするなら1, しないなら0
-
-                if (once == 0)//構造体のなかの変数を1度だけ変更する
+                normal_talk(tryRPG_dic, 4, new int[] { 2, 3, 4, 10 }, 0.04f, 1, 2, tryRPG_dic, 1, new int[] { 11 }, tryRPG_dic, 1, new int[] { 12 });
+                if (talk_finish == 1)
                 {
-                    prameters.change_use_st_count = 3;
-                    prameters.normal_change_st_num = new int[] { 0, 1, 2 };
-                    prameters.max_change_char_count = 3;
-                    prameters.normal_change_char_num = new int[][] { new int[] { 0, 2, 3 }, new int[] { 0, 1, 5 }, new int[] { 0, 2, 4 } };//new int[][] { new int[] { 1, 2, 6 }, new int[] { 0, 1, 3 }, new int[] { 1, 2, 3 } };
-                    prameters.change_fontsize = new int[][] { new int[] { 10, 20, 30 }, new int[] { 5, 29, 4 }, new int[] { 1, 2, 3 } };
-
-                    prameters.Ychange_use_st_count = 1;
-                    prameters.yes_change_st_num = new int[] { 0 };
-                    prameters.Ymax_change_char_count = 1;
-                    prameters.yes_change_char_num = new int[][] { new int[] { 0 } };
-                    prameters.Ychange_fontsize = new int[][] { new int[] { 30 } };
-
-                    prameters.Nchange_use_st_count = 1;
-                    prameters.no_change_st_num = new int[] { 0 };
-                    prameters.Nmax_change_char_count = 1;
-                    prameters.no_change_char_num = new int[][] { new int[] { 0 } };
-                    prameters.Nchange_fontsize = new int[][] { new int[] { 30 } };
-                    Debug.Log(1212121211);
-                    once++;
+                    Addressables.Release(g5);
+                    Addressables.Release(g6);
+                    Addressables.Release(g7);
+                    Addressables.Release(g8);
+                    cat = false;
+                    talk_finish = 0;
+                    PlayerPrefs.SetInt("cat", 1);
+                    catf = PlayerPrefs.GetInt("cat");
                 }
-            //(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int whether_use_stand, int bt_st_num, Dictionary<int, string> yesBt_dic, int yesBt_use_st_count, int[] yesBt_use_st_no_key, Dictionary<int, string> noBt_dic, int noBt_use_st_count, int[] noBt_use_st_no_key)
-            normal_talk(tryRPG_dic, 4, new int[] { 2, 3, 4, 10 }, 0.04f, 1, 2, tryRPG_dic, 1, new int[] { 11 }, tryRPG_dic, 1, new int[] { 12 });
-
-
-            PlayerPrefs.SetInt("cat", 1);
-                catf = PlayerPrefs.GetInt("cat");
-
-                if (d == 1 & b == 0)
-                {
-                    PlayerPosition.yesClick = false;//staticのスクリプトPlayerPositionでボタンの状態を保存しているモノを元に戻してあげる
-                    PlayerPosition.noClick = false;
-                    d = 0;
-                }
-                textStop = false;
             }
             
+        }
+        
 
 
-            if (Input.GetKeyDown(KeyCode.E) && tc.sword == "sword")//ここのifに使う関数を直接入れるとなんかうまく動かない
+        if (Input.GetKeyDown(KeyCode.E) && tc.sword == "sword")//ここのifに使う関数を直接入れるとなんかうまく動かない
             {
                 sword = true;
             }
@@ -393,7 +391,7 @@ public class ControlAllTexst : MonoBehaviour
 
 
     //引数の使い方(   使用するDictionary,使用する文数,使用する文のキー　new int[] {?,?,?}, 文の表示speed, 画像を挿入する文の指定, 画像を消す文の指定,ボタンは何文目？,Yesで使うDictionary,Yesで使う文数, Yesで使うキー, Noで使うDictionary, Nod使う文数, Noで使うキー)
-    void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int whether_use_stand, int bt_st_num, Dictionary<int, string> yesBt_dic, int yesBt_use_st_count, int[] yesBt_use_st_no_key, Dictionary<int, string> noBt_dic, int noBt_use_st_count, int[] noBt_use_st_no_key)
+    public void normal_talk(Dictionary<int, string> dic, int use_st_count, int[] use_st_no_key, float st_speed, int whether_use_stand, int bt_st_num, Dictionary<int, string> yesBt_dic, int yesBt_use_st_count, int[] yesBt_use_st_no_key, Dictionary<int, string> noBt_dic, int noBt_use_st_count, int[] noBt_use_st_no_key)
 
 
 
@@ -487,7 +485,6 @@ public class ControlAllTexst : MonoBehaviour
                     {
                         InputTexts[it] = noBt_dic[noBt_use_st_no_key[it]];
                     }
-
                 }
             }
 
@@ -501,38 +498,17 @@ public class ControlAllTexst : MonoBehaviour
                 if (textCharKazu != InputTexts[st_num].Length)//Update毎に文の文字を1文字ずつdisplayedTextに入れる
                 {
 
-                    //textGenerator.Populate(displayedText, this.GetComponent<Text>().GetGenerationSettings(extents));
 
-                    //if (textGenerator.characterCount > 5)
-                    //{
-                    //UICharInfo uiCharInfo = textGenerator.characters[3];
-                    //Vector2 mojinobasho = uiCharInfo.cursorPos / this.GetComponent<Text>().pixelsPerUnit;
-                    //Debug.Log(mojinobasho);
-                    //uiCharInfo.cursorPos += new Vector2(13 * this.GetComponent<Text>().pixelsPerUnit, 100 * this.GetComponent<Text>().pixelsPerUnit);
-
-                    //}
                     sort_image(ref image_Ctrl_Parameters);
-
-                    change_fontsize(ref prameters);//変更する箇所が多いと見にくくなりそうだったので、分けました。
+                    change_fontsize(ref fontsize_parameters);//変更する箇所が多いと見にくくなりそうだったので、分けました。
 
                     if (e == 0)//通常のフォントサイズでの文生成
                     {
                         displayedText = displayedText + "<size=" + normal_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";//
                     }
-
                     e = 0;
-
-                    //displayedText = displayedText + "<size=" + normal_fontsize + ">" + InputTexts[st_num][textCharKazu] + "</size>";//
                     textCharKazu++;
 
-                    //if (st_num == st_st_num && h == 0)
-                    //{
-                    //inst_sort_image1 = Instantiate(sort_image1, new Vector3(672f, 230f, 0.0f), Quaternion.identity, canvas.transform);//画像の表示
-                    //check_existence++;//画像がヒエラルキーに存在することをチェックしておきたいもの
-                    //h++;
-                    //}
-
-                    
 
                     if (i < textCharKazu)
                     {
@@ -565,13 +541,7 @@ public class ControlAllTexst : MonoBehaviour
                             Destroy(inst_blink);
                             i = 0;
                             st_num++;
-                            //d = 0;
 
-                            //if (st_num == del_num)
-                            //{
-                                //Destroy(inst_sort_image1);//画像の削除
-                                //check_existence = 0;
-                            //}
                             destroy_image(ref image_Ctrl_Parameters);
 
                             if (b == 1)
@@ -579,9 +549,7 @@ public class ControlAllTexst : MonoBehaviour
                                 ba = 1;
                             }
 
-
                         }
-
                     }
                     else
                     {
@@ -655,17 +623,39 @@ public class ControlAllTexst : MonoBehaviour
                             normal_yes_no = 0;
                             once = 0;
                             ikkaidake = 0;
-                            if (prameters.normal_change_st_num != null)
+
+                            if (fontsize_parameters.normal_change_st_num != null)//フォントサイズ変更の構造体を元に戻す(元に戻しているわけではない)
                             {
-                                prameters.normal_change_st_num = null;
+                                fontsize_parameters.normal_change_st_num = null;
                             }
-                            if (prameters.yes_change_st_num != null)
+                            if (fontsize_parameters.yes_change_st_num != null)
                             {
-                                prameters.yes_change_st_num = null;
-                                prameters.no_change_st_num = null;
+                                fontsize_parameters.yes_change_st_num = null;
+                                fontsize_parameters.no_change_st_num = null;
                             }
 
-                            
+
+                            if(image_Ctrl_Parameters.st_st_num != null )//画像変更の構造体を元に戻す(元に戻しているわけではない)
+                            {
+                                image_Ctrl_Parameters.st_st_num = null;
+                                image_Ctrl_Parameters.del_num = null;
+                            }
+                            if(image_Ctrl_Parameters.Yst_st_num != null | image_Ctrl_Parameters.Nst_st_num != null)
+                            {
+                                image_Ctrl_Parameters.Yst_st_num = null;
+                                image_Ctrl_Parameters.Nst_st_num = null;
+                                image_Ctrl_Parameters.Ydel_num = null;
+                                image_Ctrl_Parameters.Ndel_num = null;
+                            }
+
+                            if (d == 1 & b == 0)
+                            {
+                                PlayerPosition.yesClick = false;//staticのスクリプトPlayerPositionでボタンの状態を保存しているモノを元に戻してあげる
+                                PlayerPosition.noClick = false;
+                                d = 0;
+                            }
+                            textStop = false;
+                            talk_finish = 1;
                         }
                     }
                 }
@@ -724,7 +714,6 @@ public class ControlAllTexst : MonoBehaviour
 
                 }
             }
-
         }
     }
 
@@ -770,7 +759,7 @@ public class ControlAllTexst : MonoBehaviour
 
     }
 
-    public struct fontsize_prameters
+    public struct Fontsize_parameters
     {
         public int change_use_st_count;
         public int[] normal_change_st_num;
@@ -792,18 +781,17 @@ public class ControlAllTexst : MonoBehaviour
     }
 
 
-    void change_fontsize(ref fontsize_prameters prameters)//フォントサイズを変更するときの文字生成関数
+    void change_fontsize(ref Fontsize_parameters fontsize_parameters)//フォントサイズを変更するときの文字生成関数
     {
         //型　変数名　=　A ? B :　C ? D :　E
         //型　変数名　= A ? B :(Aが真ならBを代入)　C ? D :(Cが真ならDを代入) それ以外ならEを代入
-        int use_st_count = normal_yes_no == 0 ? prameters.change_use_st_count : normal_yes_no == 1 ? prameters.Ychange_use_st_count : prameters.Nchange_use_st_count;
-        int[] change_st_num = normal_yes_no == 0 ? prameters.normal_change_st_num : normal_yes_no == 1 ? prameters.yes_change_st_num : prameters.no_change_st_num;
-        int change_char_count = normal_yes_no == 0 ? prameters.max_change_char_count : normal_yes_no == 1 ? prameters.Ymax_change_char_count : prameters.Nmax_change_char_count;
-        int[][] change_char_num = normal_yes_no == 0 ? prameters.normal_change_char_num : normal_yes_no == 1 ? prameters.yes_change_char_num : prameters.no_change_char_num;
-        int[][] fontsize = normal_yes_no == 0 ? prameters.change_fontsize : normal_yes_no == 1 ? prameters.Ychange_fontsize : prameters.Nchange_fontsize;
+        int use_st_count = normal_yes_no == 0 ? fontsize_parameters.change_use_st_count : normal_yes_no == 1 ? fontsize_parameters.Ychange_use_st_count : fontsize_parameters.Nchange_use_st_count;
+        int[] change_st_num = normal_yes_no == 0 ? fontsize_parameters.normal_change_st_num : normal_yes_no == 1 ? fontsize_parameters.yes_change_st_num : fontsize_parameters.no_change_st_num;
+        int change_char_count = normal_yes_no == 0 ? fontsize_parameters.max_change_char_count : normal_yes_no == 1 ? fontsize_parameters.Ymax_change_char_count : fontsize_parameters.Nmax_change_char_count;
+        int[][] change_char_num = normal_yes_no == 0 ? fontsize_parameters.normal_change_char_num : normal_yes_no == 1 ? fontsize_parameters.yes_change_char_num : fontsize_parameters.no_change_char_num;
+        int[][] fontsize = normal_yes_no == 0 ? fontsize_parameters.change_fontsize : normal_yes_no == 1 ? fontsize_parameters.Ychange_fontsize : fontsize_parameters.Nchange_fontsize;
 
             //Debug.Log(string.Join(", ", prameters.normal_change_st_num));
-            //Debug.Log(string.Join(prameters.normal_change_char_num));
         if (change_st_num != null && change_char_num != null)
         {
             if (st_num == change_st_num[check_st_num]) //サイズ変更する文の出番をキャッチ
@@ -864,40 +852,37 @@ public class ControlAllTexst : MonoBehaviour
         GameObject[,] set = normal_yes_no == 0 ? image_Ctrl_Parameters.set : normal_yes_no == 0 ? image_Ctrl_Parameters.Yset : image_Ctrl_Parameters.Nset ;
 
         Debug.Log(bun);
+        Debug.Log(insort_img__retsu);
         //Debug.Log(st_st_num[1]);
-        if (st_num == st_st_num[bun] && insort_img__retsu < TansuOfImage[bun].Length && ikkaidake==0)
+        if (st_st_num != null)
         {
-
-            set[bun, insort_img__retsu] = Instantiate(TansuOfImage[bun][insort_img__retsu], img_position[bun][insort_img__retsu], Quaternion.identity, canvas.transform);//画像の表示
-            check_existence = 1;//画像がヒエラルキーに存在することをチェックしておきたいもの
-            insort_img__retsu++;
-            Debug.Log(99090909090990);
-
-            if (insort_img__retsu == TansuOfImage[bun].Length)
+            if (st_num == st_st_num[bun] && insort_img__retsu < TansuOfImage[bun].Length && ikkaidake == 0)
             {
 
-                bun++;
-                insort_img__retsu = 0;
-                //count_gyo++;
+                set[bun, insort_img__retsu] = Instantiate(TansuOfImage[bun][insort_img__retsu], img_position[bun][insort_img__retsu], Quaternion.identity, canvas.transform);//画像の表示
+                check_existence = 1;//画像がヒエラルキーに存在することをチェックしておきたいもの
+                insort_img__retsu++;
+                Debug.Log(99090909090990);
 
-                if (bun == TansuOfImage.GetLength(0) && ikkaidake==0)
+                if (insort_img__retsu == TansuOfImage[bun].Length)
                 {
-                    bun = 0;
-                    //use_img_num = TansuOfImage[bun].Length;
-                    //insort_img__retsu = 0;
-                    Debug.Log(757575);
-                    ikkaidake++;
-                    //break;
+
+                    bun++;
+                    insort_img__retsu = 0;
+                    //count_gyo++;
+
+                    if (bun == TansuOfImage.GetLength(0) && ikkaidake == 0)
+                    {
+                        bun = 0;
+                        //use_img_num = TansuOfImage[bun].Length;
+                        //insort_img__retsu = 0;
+                        Debug.Log(757575);
+                        ikkaidake++;
+                        //break;
+                    }
                 }
             }
-
-            
-            
         }
-        //Debug.Log(TansuOfImage[bun].Length);
-        //Debug.Log(h);
-        
-
     }
 
 
@@ -906,24 +891,29 @@ public class ControlAllTexst : MonoBehaviour
         GameObject[,] set = normal_yes_no == 0 ? image_Ctrl_Parameters.set : normal_yes_no == 0 ? image_Ctrl_Parameters.Yset : image_Ctrl_Parameters.Nset;
         int[][] del_num = normal_yes_no == 0 ? image_Ctrl_Parameters.del_num : normal_yes_no == 1 ? image_Ctrl_Parameters.Ydel_num : image_Ctrl_Parameters.Ndel_num;
 
-        if (image_Ctrl_Parameters.del_num[bunbun][del_img_retsu] == st_num)
+        if (del_num!=null)
         {
-            Destroy(set[bunbun, del_img_retsu]);
-            check_existence = 0;
-            del_img_retsu++;
-
-
-            if (set.GetLength(1) == del_img_retsu)
+            if (del_num[bunbun][del_img_retsu] == st_num)
             {
-                bunbun++;
-                del_img_retsu = 0;
+                Destroy(set[bunbun, del_img_retsu]);
+                check_existence = 0;
+                del_img_retsu++;
 
-                if(bunbun == image_Ctrl_Parameters.del_num.GetLength(0))
+
+                if (set.GetLength(1) == del_img_retsu)
                 {
-                    bunbun = 0;
+                    bunbun++;
+                    del_img_retsu = 0;
+
+                    if (bunbun == del_num.GetLength(0))
+                    {
+                        bunbun = 0;
+                    }
                 }
             }
         }
+        
+        
         
         if (st_num== InputTexts.Length - 1 | bt_shokika==1)
         {
